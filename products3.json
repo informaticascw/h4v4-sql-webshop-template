@@ -1,0 +1,28 @@
+{
+    "products": [
+      {
+        "name": "Wireless Mouse",
+        "category": "Electronics",
+        "brand": "LogiTech",
+        "price": 29.99,
+        "colors": ["Black", "White", "Blue"],
+        "materials": ["Plastic", "Rubber", "Metal"]
+      },
+      {
+        "name": "T-shirt Classic",
+        "category": "Clothing",
+        "brand": "Hanes",
+        "price": 14.95,
+        "colors": ["Red", "Green"],
+        "materials": ["Cotton", "Polyester"]
+      },
+      {
+        "name": "Ceramic Mug",
+        "category": "Home & Kitchen",
+        "brand": "KitchenPro",
+        "price": 9.50,
+        "colors": ["White", "Blue", "Yellow"],
+        "materials": ["Ceramic", "Metal"]
+      }
+    ]
+  }
