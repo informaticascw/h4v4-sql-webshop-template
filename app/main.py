@@ -2,9 +2,14 @@
 
 import sqlite3
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
+# Serve static files like index.html, script.js, etc.
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+# Serve API
 @app.get("/api/products")
 def get_products():
     conn = sqlite3.connect("products.db")
@@ -39,3 +44,8 @@ def get_products():
 
     conn.close()
     return {"products": result}
+
+# start server
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app)  # app is nog niet gedefinieerd hier!
