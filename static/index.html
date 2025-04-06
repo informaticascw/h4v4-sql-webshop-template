@@ -74,7 +74,7 @@
           tile.className = 'tile';
 
           // Simpele afbeelding (eventueel te vervangen door product.imageUrl)
-          const imgUrl = 'https://via.placeholder.com/250x200?text=' + encodeURIComponent(product.name || 'Product');
+          const imgUrl = '/images/' + encodeURIComponent(product.id || 'Product') + '.png';
           let content = `<img src="${imgUrl}" alt="${product.name || 'Product'}">`;
 
           // Titel bovenaan als 'name' bestaat
