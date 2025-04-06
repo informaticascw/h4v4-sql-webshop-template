@@ -9,7 +9,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// install python libraries
-	// "postCreateCommand": "pip3 install pygame",
+	"postCreateCommand": "pip3 install fastapi uvicorn",
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 	// Configure tool-specific properties.

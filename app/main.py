@@ -6,13 +6,10 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-# Serve static files like index.html, script.js, etc.
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
-
 # Serve API
 @app.get("/api/products")
 def get_products():
-    conn = sqlite3.connect("products.db")
+    conn = sqlite3.connect("data/products.db")
 
     product_query = conn.execute("SELECT * FROM products")
     product_rows = product_query.fetchall()
@@ -44,6 +41,9 @@ def get_products():
 
     conn.close()
     return {"products": result}
+
+# Serve static files like index.html, script.js, etc.
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 # start server
 if __name__ == "__main__":
