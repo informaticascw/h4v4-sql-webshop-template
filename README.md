@@ -117,6 +117,10 @@ Map met de configuratie voor de editor VS Code die wordt gebruikt door Gitpod en
 Op sommige scholen blokkeert de firewall het gebruik van Codespaces. Dit is een instelling die alleen door de firewall beheerder kan worden aangepast. Tijdelijke oplossing: Verbind via een hotspot van je mobiel.
 
 # Documentatie 
+* Video over de werking van RESTful API's<br>
+https://www.youtube.com/watch?v=-mN3VyJuCjM
+
+
 
 * tutorial building a REST-api with postgressDB + jsnode + jsexpress<br>
 https://blog.logrocket.com/setting-up-a-restful-api-with-node-js-and-postgresql-d96d6fc892d8/
