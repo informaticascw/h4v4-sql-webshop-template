@@ -18,10 +18,10 @@ def dict_factory(cursor, row):
 @app.get("/api/products")
 def get_products(
     brand: list[str] = Query(default=[]),
-    material: list[str] = Query(default=[])
+    color: list[str] = Query(default=[])
 ):
     print("DEBUG: Starting /api/products endpoint")
-    print("DEBUG: Parameters - brand:", brand, ", material:", material)
+    print("DEBUG: Parameters - brand:", brand, ", color:", color)
     db_connection = sqlite3.connect("data/products.db")
     db_connection.row_factory = dict_factory  # Convert rows into dictionaries
 
@@ -34,8 +34,8 @@ def get_products(
             b.name AS brand 
         FROM products p
         LEFT JOIN brands b ON p.brand_id = b.id
-        LEFT JOIN product_materials pm ON p.id = pm.product_id
-        LEFT JOIN materials m ON pm.material_id = m.id
+        LEFT JOIN product_colors pc ON p.id = pc.product_id
+        LEFT JOIN colors c ON pc.color_id = c.id
     """
     filters = []
     params = []
@@ -46,11 +46,11 @@ def get_products(
         filters.append("b.name IN (" + placeholders + ")")
         params.extend(brand)
 
-    # Add filter for materials
-    if material:
-        placeholders = ", ".join(["?"] * len(material))
-        filters.append("m.name IN (" + placeholders + ")")
-        params.extend(material)
+    # Add filter for colors
+    if color:
+        placeholders = ", ".join(["?"] * len(color))
+        filters.append("c.name IN (" + placeholders + ")")
+        params.extend(color)
 
     # Append WHERE clause if there are filters
     if filters:
@@ -65,28 +65,28 @@ def get_products(
     product_rows = db_connection.execute(query, params).fetchall()
     print("DEBUG: Query result (first 5 rows):", product_rows[:5])
 
-    # Add values for n:m property (e.g., materials)
+    # Add values for n:m property (e.g., colors)
     result = []
     for product in product_rows:
         product_id = product["id"]
 
-        # Fetch materials for the product
-        material_query = """
-            SELECT m.name
-            FROM materials m
-            JOIN product_materials pm ON m.id = pm.material_id
-            WHERE pm.product_id = ?
+        # Fetch colors for the product
+        color_query = """
+            SELECT c.name
+            FROM colors c
+            JOIN product_colors pc ON c.id = pc.color_id
+            WHERE pc.product_id = ?
         """
-        # Execute the query to fetch materials for the current product
-        print("DEBUG: Query submitted:", material_query)
-        material_rows = db_connection.execute(material_query, (product_id,)).fetchall()
-        print("DEBUG: Query result (first 5 rows):", material_rows[:5])
+        # Execute the query to fetch colors for the current product
+        print("DEBUG: Query submitted:", color_query)
+        color_rows = db_connection.execute(color_query, (product_id,)).fetchall()
+        print("DEBUG: Query result (first 5 rows):", color_rows[:5])
 
-        # Add fetched materials to product
-        materials = []
-        for row in material_rows:
-            materials.append(row["name"])
-        product["material"] = materials
+        # Add fetched colors to product
+        colors = []
+        for row in color_rows:
+            colors.append(row["name"])
+        product["color"] = colors
         result.append(product)
 
     db_connection.close()
@@ -108,17 +108,17 @@ def get_filters():
     print("DEBUG: Query result (first 5 rows):", brands_result[:5])  
     brands = [row["name"] for row in brands_result]
 
-    # Fetch all distinct materials
-    materials_query = "SELECT name FROM materials"
-    print("DEBUG: Query submitted:", materials_query)  
-    materials_result = db_connection.execute(materials_query).fetchall()
-    print("DEBUG: Query result (first 5 rows):", materials_result[:5])  
-    materials = [row["name"] for row in materials_result]
+    # Fetch all distinct colors
+    colors_query = "SELECT name FROM colors"
+    print("DEBUG: Query submitted:", colors_query)  
+    colors_result = db_connection.execute(colors_query).fetchall()
+    print("DEBUG: Query result (first 5 rows):", colors_result[:5])  
+    colors = [row["name"] for row in colors_result]
 
     # Construct the response
     filters = {
         "brand": brands,
-        "material": materials
+        "color": colors
     }
 
     db_connection.close()

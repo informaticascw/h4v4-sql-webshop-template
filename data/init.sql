@@ -5,8 +5,8 @@
 -- Remove existing tables (for a restartable setup)
 DROP TABLE IF EXISTS brands;
 DROP TABLE IF EXISTS products;
-DROP TABLE IF EXISTS materials;
-DROP TABLE IF EXISTS product_materials;
+DROP TABLE IF EXISTS colors;
+DROP TABLE IF EXISTS product_colors;
 
 -- Create brands table
 CREATE TABLE brands (
@@ -23,43 +23,42 @@ CREATE TABLE products (
     FOREIGN KEY(brand_id) REFERENCES brands(id)
 );
 
--- Create materials table
-CREATE TABLE materials (
+-- Create colors table
+CREATE TABLE colors (
     id INTEGER PRIMARY KEY,
     name TEXT
 );
 
 -- Create join table for N:M relationship
-CREATE TABLE product_materials (
+CREATE TABLE product_colors (
     product_id INTEGER,
-    material_id INTEGER,
+    color_id INTEGER,
     FOREIGN KEY(product_id) REFERENCES products(id),
-    FOREIGN KEY(material_id) REFERENCES materials(id)
+    FOREIGN KEY(color_id) REFERENCES colors(id)
 );
 
 -- Add brands
 INSERT INTO brands (id, name) VALUES
-    (1, 'LogiTech'),
-    (2, 'Hanes'),
-    (3, 'KitchenPro');
+    (1, 'Smurf Toys Inc.'),
+    (2, 'Smurf Mania');
 
 -- Add products
 INSERT INTO products (id, name, brand_id, price) VALUES
-    (1, 'Wireless Mouse', 1, 29.99),
-    (2, 'T-shirt Classic', 2, 14.95),
-    (3, 'Ceramic Mug', 3, 9.50);
+    (1, 'Muzieksmurf', 1, 29.99),
+    (2, 'Knutselsmurf', 2, 14.95),
+    (3, 'Smurfin', 1, 9.50);
 
--- Add materials
-INSERT INTO materials (id, name) VALUES
-    (1, 'Plastic'),
-    (2, 'Rubber'),
-    (3, 'Metal'),
-    (4, 'Cotton'),
-    (5, 'Polyester'),
-    (6, 'Ceramic');
+-- Add colors
+INSERT INTO colors (id, name) VALUES
+    (1, 'Blauw'),
+    (2, 'Wit'),
+    (3, 'Donkerblauw'),
+    (4, 'Geel'),
+    (5, 'Goud'),
+    (6, 'Bruin');
 
--- Link products to materials
-INSERT INTO product_materials (product_id, material_id) VALUES
-    (1, 1), (1, 2), (1, 3),
-    (2, 4), (2, 5),
-    (3, 6), (3, 3);
+-- Link products to colors
+INSERT INTO product_colors (product_id, color_id) VALUES
+    (1, 1), (1, 2), (1, 5),
+    (2, 1), (2, 2), (2, 3), (2, 5), (2, 6),
+    (3, 4), (3, 1), (3, 2);
