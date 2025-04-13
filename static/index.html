@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- source: https://chatgpt.com/share/67f1905a-73b0-8012-ae39-f105fcf0efc4-->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -14,7 +13,7 @@
   <script>
     async function loadProducts() {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch('/api/products'); // Fetch all products from the API
         const data = await response.json();
         const grid = document.getElementById('productGrid');
 
@@ -23,31 +22,31 @@
           tile.className = 'tile';
           let content = "";
 
-          // Titel bovenaan 
+          // Product title
           content += `<h2>${product.name || 'Product'}</h2>`;
 
-          // Afbeelding
+          // Product image
           const imgUrl = '/images/' + encodeURIComponent(product.id || '0') + '.png';
           content += `<img src="${imgUrl}" alt="${product.name || '0'}">`;
 
-          // Alle andere properties tonen
+          // Display product properties
           for (const [key, value] of Object.entries(product)) {
-            if (key === 'name') continue; // name hebben we al apart gezet
-            if (key === 'id') continue; // id is al gebruikt voor het plaatje
+            if (key === 'name') continue; // Skip name (already displayed)
+            if (key === 'id') continue; // Skip id (used for the image)
 
-            // Maak het label mooier (bijv. 'price' -> 'Price')
+            // Format the label (e.g., 'price' -> 'Price')
             const label = key.charAt(0).toUpperCase() + key.slice(1);
 
-            // Controleer of het een array is
+            // Check if the value is an array
             if (Array.isArray(value)) {
-              // Maak label met lijst van waarden
+              // Display label with a list of values
               content += `<p><strong>${label}:</strong></p><ul>`;
               value.forEach(item => {
                 content += `<li>${item}</li>`;
               });
               content += `</ul>`;
             } else {
-              // Maak label met enkele waarde
+              // Display label with a single value
               content += `<p><strong>${label}:</strong> ${value}</p>`;
             }
           }
@@ -56,12 +55,12 @@
           grid.appendChild(tile);
         });
       } catch (error) {
-        console.error('Fout bij het laden van producten:', error);
-        document.getElementById('productGrid').innerHTML = '<p>Kan producten niet laden.</p>';
+        console.error('Error loading products:', error);
+        document.getElementById('productGrid').innerHTML = '<p>Unable to load products.</p>';
       }
     }
 
-    loadProducts();
+    loadProducts(); 
   </script>
 
   <hr>
