@@ -2,26 +2,34 @@
 -- create database from command line:
 -- sqlite3 products.db < init_db.sql
 
--- Verwijder bestaande tabellen (voor herstartbare setup)
-DROP TABLE IF EXISTS product_materials;
-DROP TABLE IF EXISTS materials;
+-- Remove existing tables (for a restartable setup)
+DROP TABLE IF EXISTS brands;
 DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS materials;
+DROP TABLE IF EXISTS product_materials;
 
--- Maak products-tabel aan
+-- Create brands table
+CREATE TABLE brands (
+    id INTEGER PRIMARY KEY,
+    name TEXT
+);
+
+-- Create products table
 CREATE TABLE products (
     id INTEGER PRIMARY KEY,
     name TEXT,
-    brand TEXT,
-    price REAL
+    brand_id INTEGER,
+    price REAL,
+    FOREIGN KEY(brand_id) REFERENCES brands(id)
 );
 
--- Maak materials-tabel aan
+-- Create materials table
 CREATE TABLE materials (
     id INTEGER PRIMARY KEY,
     name TEXT
 );
 
--- Maak koppeltabel voor N:M-relatie
+-- Create join table for N:M relationship
 CREATE TABLE product_materials (
     product_id INTEGER,
     material_id INTEGER,
@@ -29,13 +37,19 @@ CREATE TABLE product_materials (
     FOREIGN KEY(material_id) REFERENCES materials(id)
 );
 
--- Voeg producten toe
-INSERT INTO products (id, name, brand, price) VALUES
-    (1, 'Wireless Mouse', 'LogiTech', 29.99),
-    (2, 'T-shirt Classic', 'Hanes', 14.95),
-    (3, 'Ceramic Mug', 'KitchenPro', 9.50);
+-- Add brands
+INSERT INTO brands (id, name) VALUES
+    (1, 'LogiTech'),
+    (2, 'Hanes'),
+    (3, 'KitchenPro');
 
--- Voeg materialen toe
+-- Add products
+INSERT INTO products (id, name, brand_id, price) VALUES
+    (1, 'Wireless Mouse', 1, 29.99),
+    (2, 'T-shirt Classic', 2, 14.95),
+    (3, 'Ceramic Mug', 3, 9.50);
+
+-- Add materials
 INSERT INTO materials (id, name) VALUES
     (1, 'Plastic'),
     (2, 'Rubber'),
@@ -44,7 +58,7 @@ INSERT INTO materials (id, name) VALUES
     (5, 'Polyester'),
     (6, 'Ceramic');
 
--- Koppel producten aan materialen
+-- Link products to materials
 INSERT INTO product_materials (product_id, material_id) VALUES
     (1, 1), (1, 2), (1, 3),
     (2, 4), (2, 5),
