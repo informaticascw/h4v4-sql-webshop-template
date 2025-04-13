@@ -46,7 +46,8 @@ INSERT INTO brands (id, name) VALUES
 INSERT INTO products (id, name, brand_id, price) VALUES
     (1, 'Muzieksmurf', 1, 29.99),
     (2, 'Knutselsmurf', 2, 14.95),
-    (3, 'Smurfin', 1, 9.50);
+    (3, 'Smurfin', 1, 9.50),
+    (4, 'Grote smurf', 1, 10.50);
 
 -- Add colors
 INSERT INTO colors (id, name) VALUES
@@ -55,10 +56,12 @@ INSERT INTO colors (id, name) VALUES
     (3, 'Donkerblauw'),
     (4, 'Geel'),
     (5, 'Goud'),
-    (6, 'Bruin');
+    (6, 'Bruin'),
+    (7, 'Rood');
 
 -- Link products to colors
 INSERT INTO product_colors (product_id, color_id) VALUES
     (1, 1), (1, 2), (1, 5),
     (2, 1), (2, 2), (2, 3), (2, 5), (2, 6),
-    (3, 4), (3, 1), (3, 2);
+    (3, 4), (3, 1), (3, 2),
+    (4, 7), (4, 1), (4, 2);
