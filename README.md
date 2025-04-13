@@ -3,13 +3,22 @@ Startcode voor het programmeren van een webshop met een html front end en python
 
 Deze repo is onderdeel van het vak informatica op het Stanislascollege Westplantsoen.
 
-[Meer info over deze opdracht](https://stanislas.informatica.nu/)
+Meer info over deze opdracht op [https://stanislas.informatica.nu](https://stanislas.informatica.nu/)
+
+## Snel bekijken?
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=961118997)
+
+Start de webshop in de terminal van de Codespace met het commando 
+```
+bash start.sh
+```
 
 # Wat kan onze webshop
 Wat heeft de webshop wel:
 - Artikelen tonen
-- Filteren in de getoonde artikelen (nog niet af)
-- Basis bestelpagina 
+- Filteren van artikelen
+- Zeer basic bestelproces (mailen wat je wilt kopen)
 
 Wat heeft de webshop niet:
 - Een winkelmand functie 
@@ -21,6 +30,8 @@ Wat heeft de webshop niet:
 - Webpagina voor beheerder 
 <br>(je moet de producten in je webshop aanpassen met sql opdrachten en dan de webshop herstarten)
 - Voorraad en klantgegevens bijhouden
+
+Hosting:
 
 Onze webshop draait in een devcontainer op Codespaces. Dat betekent dat de webshop uitgaat als jij je browser afsluit. Je hebt een server nodig om je webshop permanent beschikbaar te maken, dat kost meestal een klein bedrag per maand en het vraagt wat technische handigheid om de webshop op de server te installeren.
 
