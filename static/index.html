@@ -1,26 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css">
   <title>Webshop</title>
 </head>
+
 <body>
-  <h1>Onze Producten</h1>
+  <header id="header" class="box">
+    <h1>De Smurf Sjop</h1>
+    <hr>
+  </header>
 
   <!-- Main Layout -->
-  <div class="main-layout">
+  <div id="main-layout">
+
     <!-- Filter Section -->
-    <div id="filters">
-      <h2>Filters</h2>
-      <div id="productFilters"></div>
-      <button onclick="loadFilteredProducts()">Toepassen</button>
-    </div>
+    <aside id="filter-section" class="box">
+      <button onclick="loadFilteredProducts()">Filters toepassen</button>
+      <div id="product-filters">
+        <!-- Filters will be added here dynamically by loadFilters() -->
+        <p class="loading">Loading filters...</p>
+      </div>
+    </aside>
 
     <!-- Product Grid -->
-    <div class="grid" id="productGrid"></div>
+    <div id="product-grid">
+      <!-- Products will be added here dynamically by loadFilteredProducts() -->
+      <p class="loading">Loading products...</p>
+    </div>
   </div>
+
+  <section id="order-section" class="box">
+    <h2>Bestellen</h2>
+    <p>Om een product te bestellen, smurf je een mailtje naar info@shop.nl. Zet in je mail
+    <ul>
+      <li>Welke artikelen en hoeveel je wilt bestellen.</li>
+      <li>Het adres waar je bestelling afgeleverd moet worden.</li>
+      <li>Je mobiele nummer.</li>
+    </ul>Je ontvangt een Tikkie als wij je mail hebben gelezen. Na betaling van het Tikkie versturen wij de bestelling.
+    </p>
+    <p>Bedankt voor je bestelling!</p>
+  </section>
+
+  <footer id="footer" class="box">
+    <hr>
+    <p>Deze webshop is een opdracht van het vak informatica</p>
+  </footer>
 
   <script>
     // Load filters dynamically from /api/filters
@@ -28,100 +56,115 @@
       try {
         const response = await fetch('/api/filters');
         const data = await response.json();
-        const productFilters = document.getElementById('productFilters');
+        const productFilters = document.getElementById('product-filters');
+
+        // Generate filter HTML using innerHTML
+        let filtersHTML = '';
 
         // Iterate over all filter properties returned by the API
         for (const [key, value] of Object.entries(data.filters)) {
-          const filterContainer = document.createElement('div');
-          filterContainer.className = 'filter-container';
+          // Create a section for each filter
+          filtersHTML += `<div class="filter-container">`;
+          filtersHTML += `<h3>${key.charAt(0).toUpperCase() + key.slice(1)}</h3>`;
 
-          // Create a label for the filter
-          const label = document.createElement('h3');
-          label.textContent = key.charAt(0).toUpperCase() + key.slice(1);
-          filterContainer.appendChild(label);
-
-          // Handle other filters (multi-select checkboxes)
+          // Add checkboxes for each filter option
           if (Array.isArray(value)) {
             value.forEach(option => {
-              const checkbox = document.createElement('input');
-              checkbox.type = 'checkbox';
-              checkbox.value = option;
-              checkbox.id = `filter-${key}-${option}`;
-
-              const checkboxLabel = document.createElement('label');
-              checkboxLabel.htmlFor = `filter-${key}-${option}`;
-              checkboxLabel.textContent = option;
-
-              filterContainer.appendChild(checkbox);
-              filterContainer.appendChild(checkboxLabel);
-              filterContainer.appendChild(document.createElement('br'));
+              const checkboxId = `filter-${key}-${option}`;
+              filtersHTML += `
+                <input type="checkbox" id="${checkboxId}" value="${option}">
+                <label for="${checkboxId}">${option}</label><br>
+              `;
             });
           }
 
-          productFilters.appendChild(filterContainer);
+          filtersHTML += `</div>`;
         }
+
+        // Set the generated HTML to the productFilters container
+        productFilters.innerHTML = filtersHTML;
       } catch (error) {
         console.error('Error loading filters:', error);
+        const productFilters = document.getElementById('product-filters');
+        productFilters.innerHTML = '<p class="error">Failed to load filters.</p>';
       }
     }
 
     // Apply filters and reload products
     async function loadFilteredProducts() {
-      const queryParams = new URLSearchParams();
+      try {
+        const queryParams = new URLSearchParams();
 
-      // Get all filter inputs
-      const filterInputs = document.querySelectorAll('#productFilters input');
-      filterInputs.forEach(input => {
-        if (input.type === 'checkbox' && input.checked) {
-          // Add checkbox filters (e.g., brands, materials)
-          const [key] = input.id.replace('filter-', '').split('-');
-          queryParams.append(key, input.value);
-        }
-      });
-
-      console.log('DEBUG: Applied filters:', queryParams.toString());
-      const response = await fetch(`/api/products?${queryParams.toString()}`);
-      const data = await response.json();
-
-      const grid = document.getElementById('productGrid');
-      grid.innerHTML = ''; // Clear existing products
-
-      data.products.forEach(product => {
-        const tile = document.createElement('div');
-        tile.className = 'tile';
-        let content = "";
-
-        // Product title
-        content += `<h2>${product.name || 'Product'}</h2>`;
-
-        // Product image
-        const imgUrl = '/images/' + encodeURIComponent(product.id || '0') + '.png';
-        content += `<img src="${imgUrl}" alt="${product.name || '0'}">`;
-
-        // Display product properties
-        for (const [key, value] of Object.entries(product)) {
-          if (key === 'name' || key === 'id') continue; // Skip name and id
-
-          // Format the label (e.g., 'price' -> 'Price')
-          const label = key.charAt(0).toUpperCase() + key.slice(1);
-
-          // Check if the value is an array
-          if (Array.isArray(value)) {
-            // Display label with a list of values
-            content += `<p><strong>${label}:</strong></p><ul>`;
-            value.forEach(item => {
-              content += `<li>${item}</li>`;
-            });
-            content += `</ul>`;
-          } else {
-            // Display label with a single value
-            content += `<p><strong>${label}:</strong> ${value}</p>`;
+        // Get all filter inputs
+        const filterInputs = document.querySelectorAll('#product-filters input');
+        filterInputs.forEach(input => {
+          if (input.type === 'checkbox' && input.checked) {
+            // Add checkbox filters (e.g., brands, colors)
+            const [key] = input.id.replace('filter-', '').split('-');
+            queryParams.append(key, input.value);
           }
+        });
+
+        // Load products with applied filters
+        console.log('DEBUG: Applied filters:', queryParams.toString());
+        const response = await fetch(`/api/products?${queryParams.toString()}`);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
         }
 
-        tile.innerHTML = content;
-        grid.appendChild(tile);
-      });
+        const data = await response.json();
+
+        // Generate product grid HTML
+        const grid = document.getElementById('product-grid');
+        let gridHTML = '';
+
+        // For each product, create a tile with its details
+        for (var product of data.products) {
+          var content = '<div class="product-tile box">';
+
+          // Display product name
+          content += '<h2>' + (product.name || 'Product') + '</h2>';
+
+          // Display product image
+          var imgUrl = '/images/' + encodeURIComponent(product.id || '0') + '.png';
+          content += '<img src="' + imgUrl + '" alt="' + (product.name || '0') + '">';
+
+          // For each product property, create a label and value
+          for (var key in product) {
+            if (key === 'name' || key === 'id' || key === 'price') continue; // Skip name, id and price
+
+            // Format the label (e.g., 'product_name' -> 'Product Name')
+            var label = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+
+            // Check if the value is an array
+            if (Array.isArray(product[key])) {
+              // Display label with a list of values
+              content += '<p><strong>' + label + ':</strong></p><ul>';
+              for (var value of product[key]) {
+                content += '<li>' + value + '</li>';
+              }
+              content += '</ul>';
+            } else {
+              // Display label with a single value
+              content += '<p><strong>' + label + ':</strong> ' + product[key] + '</p>';
+            }
+          }
+          // Display product price
+          if (product.price) {
+            content += '<p><strong>Prijs:</strong> € ' + product.price.toFixed(2) + '</p>';
+          }
+          content += '</div>';
+          gridHTML += content;
+        }
+
+        // Set the generated HTML to the product grid
+        grid.innerHTML = gridHTML;
+      } catch (error) {
+        console.error('Error loading products:', error);
+        const grid = document.getElementById('product-grid');
+        grid.innerHTML = '<p class="error">Failed to load products.</p>';
+      }
     }
 
     // Load filters and products on page load
@@ -129,7 +172,6 @@
     loadFilteredProducts();
   </script>
 
-  <hr>
-  <p>Deze webshop is een opdracht van het vak informatica</p>
 </body>
+
 </html>

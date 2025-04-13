@@ -30,7 +30,7 @@ def get_products(
         SELECT 
             p.id, 
             p.name, 
-            p.price AS prijs, 
+            p.price, 
             b.name AS merk
         FROM products p
         LEFT JOIN brands b ON p.brand_id = b.id
