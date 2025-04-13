@@ -9,15 +9,18 @@
 <body>
   <h1>Onze Producten</h1>
 
-  <!-- Filter Section -->
-  <div id="filters">
-    <h2>Filters</h2>
-    <div id="dynamicFilters"></div>
-    <button onclick="applyFilters()">Toepassen</button>
-  </div>
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Filter Section -->
+    <div id="filters">
+      <h2>Filters</h2>
+      <div id="productFilters"></div>
+      <button onclick="loadFilteredProducts()">Toepassen</button>
+    </div>
 
-  <!-- Product Grid -->
-  <div class="grid" id="productGrid"></div>
+    <!-- Product Grid -->
+    <div class="grid" id="productGrid"></div>
+  </div>
 
   <script>
     // Load filters dynamically from /api/filters
@@ -25,7 +28,7 @@
       try {
         const response = await fetch('/api/filters');
         const data = await response.json();
-        const dynamicFilters = document.getElementById('dynamicFilters');
+        const productFilters = document.getElementById('productFilters');
 
         // Iterate over all filter properties returned by the API
         for (const [key, value] of Object.entries(data.filters)) {
@@ -37,32 +40,8 @@
           label.textContent = key.charAt(0).toUpperCase() + key.slice(1);
           filterContainer.appendChild(label);
 
-          // Handle price filter (slider)
-          if (key === 'price') {
-            const min = value.min;
-            const max = value.max;
-
-            const rangeInput = document.createElement('input');
-            rangeInput.type = 'range';
-            rangeInput.id = `filter-${key}`;
-            rangeInput.min = min;
-            rangeInput.max = max;
-            rangeInput.value = max;
-            rangeInput.step = 1;
-
-            const rangeLabel = document.createElement('span');
-            rangeLabel.id = `filter-${key}-value`;
-            rangeLabel.textContent = `${min} - ${max}`;
-
-            rangeInput.addEventListener('input', () => {
-              rangeLabel.textContent = `${min} - ${rangeInput.value}`;
-            });
-
-            filterContainer.appendChild(rangeInput);
-            filterContainer.appendChild(rangeLabel);
-          }
           // Handle other filters (multi-select checkboxes)
-          else if (Array.isArray(value)) {
+          if (Array.isArray(value)) {
             value.forEach(option => {
               const checkbox = document.createElement('input');
               checkbox.type = 'checkbox';
@@ -79,7 +58,7 @@
             });
           }
 
-          dynamicFilters.appendChild(filterContainer);
+          productFilters.appendChild(filterContainer);
         }
       } catch (error) {
         console.error('Error loading filters:', error);
@@ -87,16 +66,13 @@
     }
 
     // Apply filters and reload products
-    async function applyFilters() {
+    async function loadFilteredProducts() {
       const queryParams = new URLSearchParams();
 
       // Get all filter inputs
-      const filterInputs = document.querySelectorAll('#dynamicFilters input');
+      const filterInputs = document.querySelectorAll('#productFilters input');
       filterInputs.forEach(input => {
-        if (input.type === 'range') {
-          // Add range filter (e.g., price)
-          queryParams.append(input.id.replace('filter-', ''), input.value);
-        } else if (input.type === 'checkbox' && input.checked) {
+        if (input.type === 'checkbox' && input.checked) {
           // Add checkbox filters (e.g., brands, materials)
           const [key] = input.id.replace('filter-', '').split('-');
           queryParams.append(key, input.value);
@@ -150,7 +126,7 @@
 
     // Load filters and products on page load
     loadFilters();
-    applyFilters();
+    loadFilteredProducts();
   </script>
 
   <hr>
