@@ -1,7 +1,7 @@
 # This is a simple FastAPI application that serves a static HTML site and provides API endpoints:
 
 # source for base code https://chatgpt.com/share/67f1905a-73b0-8012-ae39-f105fcf0efc4
-# extented using copilot
+# extended using copilot
 
 import sqlite3
 from fastapi import FastAPI
@@ -21,8 +21,10 @@ def get_products(
     brand: list[str] = None,
     material: list[str] = None
 ):
+    print("DEBUG: Starting /api/products endpoint")
+    print("DEBUG: Parameters - min_price:", min_price, ", max_price:", max_price, ", brand:", brand, ", material:", material)
     db_connection = sqlite3.connect("data/products.db")
-    db_connection.row_factory = dict_factory  # Use dict_factory for query results
+    db_connection.row_factory = dict_factory # convert rows into dicts
 
     # Build the base query
     query = """
@@ -47,14 +49,14 @@ def get_products(
         filters.append("p.price <= ?")
         params.append(max_price)
 
-    # Add filter for other properties (e.g. brand and material)
+    # Add filter for other properties (e.g., brand and material)
     if brand:
         placeholders = ", ".join(["?"] * len(brand))
-        filters.append(f"b.name IN ({placeholders})")
+        filters.append("b.name IN (" + placeholders + ")")
         params.extend(brand)
     if material:
         placeholders = ", ".join(["?"] * len(material))
-        filters.append(f"m.name IN ({placeholders})")
+        filters.append("m.name IN (" + placeholders + ")")
         params.extend(material)
 
     # Append WHERE clause if there are filters
@@ -65,9 +67,12 @@ def get_products(
     query += " GROUP BY p.id"
 
     # Execute the query
+    print("DEBUG: Query submitted:", query)  
+    print("DEBUG: Query parameters:", params)
     product_rows = db_connection.execute(query, params).fetchall()
+    print("DEBUG: Query result (first 5 rows):", product_rows[:5])  
 
-    # Add values for n:m property (e.g. materials)
+    # Add values for n:m property (e.g., materials)
     result = []
     for product in product_rows:
         product_id = product["id"]
@@ -80,7 +85,9 @@ def get_products(
             WHERE pm.product_id = ?
         """
         # Execute the query to fetch materials for the current product
+        print("DEBUG: Query submitted:", material_query)  
         material_rows = db_connection.execute(material_query, (product_id,)).fetchall()
+        print("DEBUG: Query result (first 5 rows):", material_rows[:5])  
 
         # Add fetched materials to product
         materials = []
@@ -90,29 +97,43 @@ def get_products(
         result.append(product)
 
     db_connection.close()
+    print("DEBUG: Finished /api/products endpoint")  # End of endpoint
     return {"products": result}
 
 # API endpoint to get all properties and values for filters
 @app.get("/api/filters")
 def get_filters():
+    print("DEBUG: Starting /api/filters endpoint")  # Start of endpoint
+
     db_connection = sqlite3.connect("data/products.db")
     db_connection.row_factory = dict_factory  # Use dict_factory for query results
 
     # Fetch distinct price ranges
     price_query = """
-        SELECT MIN(price) AS min_price, MAX(price) AS max_price
+        SELECT 
+            MIN(price) AS min_price, 
+            MAX(price) AS max_price
         FROM products
     """
     price_result = db_connection.execute(price_query).fetchone()
+    print("DEBUG: Price range query result:", price_result)  # Debug price range
 
     # Fetch all distinct brands
     brands_query = "SELECT name FROM brands"
+
+    print("DEBUG: Query submitted:", brands_query)  
     brands_result = db_connection.execute(brands_query).fetchall()
+    print("DEBUG: Query result (first 5 rows):", brands_result[:5])  
+    
     brands = [row["name"] for row in brands_result]
 
     # Fetch all distinct materials
     materials_query = "SELECT name FROM materials"
+
+    print("DEBUG: Query submitted:", materials_query)  
     materials_result = db_connection.execute(materials_query).fetchall()
+    print("DEBUG: Query result (first 5 rows):", materials_result[:5])  
+    
     materials = [row["name"] for row in materials_result]
 
     # Construct the response
@@ -126,6 +147,7 @@ def get_filters():
     }
 
     db_connection.close()
+    print("DEBUG: Finished /api/filters endpoint")  # End of endpoint
     return {"filters": filters}
 
 # Serve static files like index.html, script.js, etc.
