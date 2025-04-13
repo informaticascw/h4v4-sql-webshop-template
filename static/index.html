@@ -8,59 +8,148 @@
 </head>
 <body>
   <h1>Onze Producten</h1>
+
+  <!-- Filter Section -->
+  <div id="filters">
+    <h2>Filters</h2>
+    <div id="dynamicFilters"></div>
+    <button onclick="applyFilters()">Toepassen</button>
+  </div>
+
+  <!-- Product Grid -->
   <div class="grid" id="productGrid"></div>
 
   <script>
-    async function loadProducts() {
+    // Load filters dynamically from /api/filters
+    async function loadFilters() {
       try {
-        const response = await fetch('/api/products'); // Fetch all products from the API
+        const response = await fetch('/api/filters');
         const data = await response.json();
-        const grid = document.getElementById('productGrid');
+        const dynamicFilters = document.getElementById('dynamicFilters');
 
-        data.products.forEach(product => {
-          const tile = document.createElement('div');
-          tile.className = 'tile';
-          let content = "";
+        // Iterate over all filter properties returned by the API
+        for (const [key, value] of Object.entries(data.filters)) {
+          const filterContainer = document.createElement('div');
+          filterContainer.className = 'filter-container';
 
-          // Product title
-          content += `<h2>${product.name || 'Product'}</h2>`;
+          // Create a label for the filter
+          const label = document.createElement('h3');
+          label.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+          filterContainer.appendChild(label);
 
-          // Product image
-          const imgUrl = '/images/' + encodeURIComponent(product.id || '0') + '.png';
-          content += `<img src="${imgUrl}" alt="${product.name || '0'}">`;
+          // Handle price filter (slider)
+          if (key === 'price') {
+            const min = value.min;
+            const max = value.max;
 
-          // Display product properties
-          for (const [key, value] of Object.entries(product)) {
-            if (key === 'name') continue; // Skip name (already displayed)
-            if (key === 'id') continue; // Skip id (used for the image)
+            const rangeInput = document.createElement('input');
+            rangeInput.type = 'range';
+            rangeInput.id = `filter-${key}`;
+            rangeInput.min = min;
+            rangeInput.max = max;
+            rangeInput.value = max;
+            rangeInput.step = 1;
 
-            // Format the label (e.g., 'price' -> 'Price')
-            const label = key.charAt(0).toUpperCase() + key.slice(1);
+            const rangeLabel = document.createElement('span');
+            rangeLabel.id = `filter-${key}-value`;
+            rangeLabel.textContent = `${min} - ${max}`;
 
-            // Check if the value is an array
-            if (Array.isArray(value)) {
-              // Display label with a list of values
-              content += `<p><strong>${label}:</strong></p><ul>`;
-              value.forEach(item => {
-                content += `<li>${item}</li>`;
-              });
-              content += `</ul>`;
-            } else {
-              // Display label with a single value
-              content += `<p><strong>${label}:</strong> ${value}</p>`;
-            }
+            rangeInput.addEventListener('input', () => {
+              rangeLabel.textContent = `${min} - ${rangeInput.value}`;
+            });
+
+            filterContainer.appendChild(rangeInput);
+            filterContainer.appendChild(rangeLabel);
+          }
+          // Handle other filters (multi-select checkboxes)
+          else if (Array.isArray(value)) {
+            value.forEach(option => {
+              const checkbox = document.createElement('input');
+              checkbox.type = 'checkbox';
+              checkbox.value = option;
+              checkbox.id = `filter-${key}-${option}`;
+
+              const checkboxLabel = document.createElement('label');
+              checkboxLabel.htmlFor = `filter-${key}-${option}`;
+              checkboxLabel.textContent = option;
+
+              filterContainer.appendChild(checkbox);
+              filterContainer.appendChild(checkboxLabel);
+              filterContainer.appendChild(document.createElement('br'));
+            });
           }
 
-          tile.innerHTML = content;
-          grid.appendChild(tile);
-        });
+          dynamicFilters.appendChild(filterContainer);
+        }
       } catch (error) {
-        console.error('Error loading products:', error);
-        document.getElementById('productGrid').innerHTML = '<p>Unable to load products.</p>';
+        console.error('Error loading filters:', error);
       }
     }
 
-    loadProducts(); 
+    // Apply filters and reload products
+    async function applyFilters() {
+      const queryParams = new URLSearchParams();
+
+      // Get all filter inputs
+      const filterInputs = document.querySelectorAll('#dynamicFilters input');
+      filterInputs.forEach(input => {
+        if (input.type === 'range') {
+          // Add range filter (e.g., price)
+          queryParams.append(input.id.replace('filter-', ''), input.value);
+        } else if (input.type === 'checkbox' && input.checked) {
+          // Add checkbox filters (e.g., brands, materials)
+          const [key] = input.id.replace('filter-', '').split('-');
+          queryParams.append(key, input.value);
+        }
+      });
+
+      const response = await fetch(`/api/products?${queryParams.toString()}`);
+      const data = await response.json();
+
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = ''; // Clear existing products
+
+      data.products.forEach(product => {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        let content = "";
+
+        // Product title
+        content += `<h2>${product.name || 'Product'}</h2>`;
+
+        // Product image
+        const imgUrl = '/images/' + encodeURIComponent(product.id || '0') + '.png';
+        content += `<img src="${imgUrl}" alt="${product.name || '0'}">`;
+
+        // Display product properties
+        for (const [key, value] of Object.entries(product)) {
+          if (key === 'name' || key === 'id') continue; // Skip name and id
+
+          // Format the label (e.g., 'price' -> 'Price')
+          const label = key.charAt(0).toUpperCase() + key.slice(1);
+
+          // Check if the value is an array
+          if (Array.isArray(value)) {
+            // Display label with a list of values
+            content += `<p><strong>${label}:</strong></p><ul>`;
+            value.forEach(item => {
+              content += `<li>${item}</li>`;
+            });
+            content += `</ul>`;
+          } else {
+            // Display label with a single value
+            content += `<p><strong>${label}:</strong> ${value}</p>`;
+          }
+        }
+
+        tile.innerHTML = content;
+        grid.appendChild(tile);
+      });
+    }
+
+    // Load filters and products on page load
+    loadFilters();
+    applyFilters();
   </script>
 
   <hr>

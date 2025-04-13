@@ -34,7 +34,7 @@ def get_products(
             p.price, 
             b.name AS brand 
         FROM products p
-        JOIN brands b ON p.brand = b.id
+        JOIN brands b ON p.brand_id = b.id
         JOIN product_materials pm ON p.id = pm.product_id
         JOIN materials m ON pm.material_id = m.id
     """
