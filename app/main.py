@@ -16,8 +16,8 @@ def dict_factory(cursor, row):
 # API endpoint to get a list of products
 @app.get("/api/products")
 def get_products(
-    min_price: float = Query(),
-    max_price: float = Query(),
+    min_price: float = Query(default=None),
+    max_price: float = Query(default=None),
     brand: list[str] = Query(default=[]),
     material: list[str] = Query(default=[])
 ):
