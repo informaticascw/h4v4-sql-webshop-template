@@ -5,21 +5,10 @@
 
 import sqlite3
 from fastapi import FastAPI, Query
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-
-# Middleware to disable caching, handy for development
-@app.middleware("http")
-async def disable_cache(request, call_next):
-    response = await call_next(request)
-    response.headers.update({
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-        "Pragma": "no-cache",
-        "Expires": "0"
-    })
-    return response
 
 # Function to convert rows into dictionaries
 def dict_factory(cursor, row):
@@ -136,8 +125,22 @@ def get_filters():
     print("DEBUG: Finished /api/filters endpoint")  
     return {"filters": filters}
 
+
 # Serve static files like index.html, script.js, etc.
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+# Do not cache static files, handy for development
+class NoCacheStaticFiles(StaticFiles):
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        response.headers.update({
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        })
+        return response
+
+# Endpoint to serve static files
+app.mount("/", NoCacheStaticFiles(directory="static", html=True), name="static")
 
 # Start server
 if __name__ == "__main__":
