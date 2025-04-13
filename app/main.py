@@ -4,7 +4,7 @@
 # extended using copilot
 
 import sqlite3
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
@@ -16,10 +16,10 @@ def dict_factory(cursor, row):
 # API endpoint to get a list of products
 @app.get("/api/products")
 def get_products(
-    min_price: float = None,
-    max_price: float = None,
-    brand: list[str] = None,
-    material: list[str] = None
+    min_price: float = Query(),
+    max_price: float = Query(),
+    brand: list[str] = Query(default=[]),
+    material: list[str] = Query(default=[])
 ):
     print("DEBUG: Starting /api/products endpoint")
     print("DEBUG: Parameters - min_price:", min_price, ", max_price:", max_price, ", brand:", brand, ", material:", material)
@@ -93,7 +93,7 @@ def get_products(
         materials = []
         for row in material_rows:
             materials.append(row["name"])
-        product["materials"] = materials
+        product["material"] = materials
         result.append(product)
 
     db_connection.close()
@@ -142,8 +142,8 @@ def get_filters():
             "min": price_result["min_price"],
             "max": price_result["max_price"]
         },
-        "brands": brands,
-        "materials": materials
+        "brand": brands,
+        "material": materials
     }
 
     db_connection.close()

@@ -103,6 +103,7 @@
         }
       });
 
+      console.log('DEBUG: Applied filters:', queryParams.toString());
       const response = await fetch(`/api/products?${queryParams.toString()}`);
       const data = await response.json();
 
