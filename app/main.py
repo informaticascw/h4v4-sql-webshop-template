@@ -17,11 +17,11 @@ def dict_factory(cursor, row):
 # API endpoint to get a list of products
 @app.get("/api/products")
 def get_products(
-    brand: list[str] = Query(default=[]),
-    color: list[str] = Query(default=[])
+    merk: list[str] = Query(default=[]),
+    kleur: list[str] = Query(default=[])
 ):
     print("DEBUG: Starting /api/products endpoint")
-    print("DEBUG: Parameters - brand:", brand, ", color:", color)
+    print("DEBUG: Parameters - merk:", merk, ", kleur:", kleur)
     db_connection = sqlite3.connect("data/products.db")
     db_connection.row_factory = dict_factory  # Convert rows into dictionaries
 
@@ -30,8 +30,8 @@ def get_products(
         SELECT 
             p.id, 
             p.name, 
-            p.price, 
-            b.name AS brand 
+            p.price AS prijs, 
+            b.name AS merk
         FROM products p
         LEFT JOIN brands b ON p.brand_id = b.id
         LEFT JOIN product_colors pc ON p.id = pc.product_id
@@ -41,16 +41,16 @@ def get_products(
     params = []
 
     # Add filter for brands
-    if brand:
-        placeholders = ", ".join(["?"] * len(brand))
+    if merk:
+        placeholders = ", ".join(["?"] * len(merk))
         filters.append("b.name IN (" + placeholders + ")")
-        params.extend(brand)
+        params.extend(merk)
 
     # Add filter for colors
-    if color:
-        placeholders = ", ".join(["?"] * len(color))
+    if kleur:
+        placeholders = ", ".join(["?"] * len(kleur))
         filters.append("c.name IN (" + placeholders + ")")
-        params.extend(color)
+        params.extend(kleur)
 
     # Append WHERE clause if there are filters
     if filters:
@@ -86,7 +86,7 @@ def get_products(
         colors = []
         for row in color_rows:
             colors.append(row["name"])
-        product["color"] = colors
+        product["kleur"] = colors
         result.append(product)
 
     db_connection.close()
@@ -117,8 +117,8 @@ def get_filters():
 
     # Construct the response
     filters = {
-        "brand": brands,
-        "color": colors
+        "merk": brands,
+        "kleur": colors
     }
 
     db_connection.close()
