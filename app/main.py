@@ -6,8 +6,20 @@
 import sqlite3
 from fastapi import FastAPI, Query
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# Middleware to disable caching, handy for development
+@app.middleware("http")
+async def disable_cache(request, call_next):
+    response = await call_next(request)
+    response.headers.update({
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    })
+    return response
 
 # Function to convert rows into dictionaries
 def dict_factory(cursor, row):
