@@ -6,12 +6,17 @@
 	// Or use "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bullseye",
 	"image": "mcr.microsoft.com/devcontainers/universal:2-linux",
 	// Features to add to the dev container. More info: https://containers.dev/features.
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// install python libraries
+	// Install python libraries after the container is created.
 	"postCreateCommand": "pip3 install fastapi uvicorn",
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	// Automatically run start.sh after the container starts 
+	"postStartCommand": "bash start.sh",
+	// Open the browser when the port is forwarded
+	"portsAttributes": {
+		"8000": {
+			"label": "Webshop",
+			"onAutoForward": "openBrowser"
+		}
+	},
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
