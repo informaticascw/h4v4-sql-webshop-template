@@ -15,6 +15,9 @@ echo "✅ Old server stopped"
 
 echo "📦 Initializing database..."
 
+# Remove the old database file if it exists
+rm -f data/products.db
+
 # (Re)create database from init.sql
 sqlite3 data/products.db < data/init.sql
 
