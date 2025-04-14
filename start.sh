@@ -2,7 +2,7 @@
 
 echo "🔁 Stopping old server..."
 
-# Stop alle oude servers
+# Stop old server if it is running
 pkill -f "python app/main.py" 2>/dev/null
 
 # Wait until the process has stopped
@@ -25,6 +25,6 @@ echo "✅ Database ready"
 
 echo "🚀 Starting FastAPI backend (using python)..."
 
-# Start FastAPI server via python, vereist uvicorn.run() in main.py
+# Start FastAPI server using python, requires uvicorn.run() in main.py
 python app/main.py
 
