@@ -1,11 +1,17 @@
 #!/bin/bash
 
-echo "🔁 Stopping old servers..."
+echo "🔁 Stopping old server..."
 
 # Stop alle oude servers
 pkill -f "python app/main.py" 2>/dev/null
 
-echo "✅ Old processes stopped"
+# Wait until the process has stopped
+while pgrep -f "python app/main.py" > /dev/null; do
+    echo "⏳ Waiting for old server to stop..."
+    sleep 1
+done
+
+echo "✅ Old server stopped"
 
 echo "📦 Initializing database..."
 
@@ -14,8 +20,8 @@ sqlite3 data/products.db < data/init.sql
 
 echo "✅ Database ready"
 
-echo "🚀 Starting FastAPI backend (via python)..."
+echo "🚀 Starting FastAPI backend (using python)..."
 
 # Start FastAPI server via python, vereist uvicorn.run() in main.py
-python app/main.py &
+python app/main.py
 
