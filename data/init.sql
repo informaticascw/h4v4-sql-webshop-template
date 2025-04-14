@@ -56,8 +56,8 @@ INSERT INTO colors (id, name) VALUES
     (3, 'Donkerblauw'),
     (4, 'Geel'),
     (5, 'Goud'),
-    (6, 'Bruin')
-    (7, 'Rood')
+    (6, 'Bruin'),
+    (7, 'Rood');
 
 -- Link products to colors
 INSERT INTO product_colors (product_id, color_id) VALUES
